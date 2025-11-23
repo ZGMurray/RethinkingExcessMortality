@@ -1,4 +1,4 @@
-# Equilibrium-Based Baseline Selection for Excess Mortality
+# Equilibrium-Selected Baselines for Excess Mortality
 
 A method for selecting country-specific baseline periods when calculating excess mortality. Outperforms fixed baselines on 7/11 validation metrics.
 
