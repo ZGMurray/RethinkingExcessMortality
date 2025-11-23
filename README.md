@@ -19,5 +19,7 @@ https://zgmurray.github.io/RethinkingExcessMortality/
 ## Data
 
 Source: Human Mortality Database (STMF)  
+
 Age-standardized using ESP2013
+
 Quasi-Poisson Regression has been used for baselines
