@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ASMR by Country</title>
+  <link rel="stylesheet" href="./assets/style.css">
+  <script defer src="./assets/libs/plotly.min.js"></script>
+  <script defer src="./assets/script.js"></script>
+</head>
+<body>
+  <main class="container">
+    <div style="margin-top: 30px; margin-bottom: 30px; text-align: center;">
+      <h1 style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 2em; margin-bottom: 15px; font-weight: bold;">
+        Rethinking Excess Mortality
+      </h1>
+      <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; margin: 0;">
+        <a href="https://zgmurray.github.io/ExcessMortalityAnalysis/" target="_blank" style="color: #0066cc; text-decoration: none; border-bottom: 1px solid #0066cc;">
+          Companion Tool - Excess Mortality Analysis
+        </a>
+      </p>
+    </div>
+    
+    <div style="margin-top: 30px; margin-bottom: 20px;">
+      <h2 style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1.2em; margin-bottom: 10px;">
+        Problem Statement
+      </h2>
+      <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6;">
+        Excess mortality estimates are highly sensitive to arbitrary analytical choices. In particular, different reference periods produce large variability in excess mortality estimates (Figure 1 & 2). Inaccurate estimates can mislead decisions on clinical practice, funding, health policy, and public health (Ioannidis et al., 2023).
+      </p>
+    </div>
+    
+    <div style="display: flex; gap: 20px; margin-top: 20px; margin-bottom: 30px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 500px;">
+        <div style="margin-bottom: 10px;">
+          <label for="baselineSelector1" style="font-family: Georgia, 'Times New Roman', serif; font-size: 14px; color: #333333; margin-right: 10px;">Baseline:</label>
+          <select id="baselineSelector1" style="font-family: Georgia, 'Times New Roman', serif; font-size: 14px; padding: 5px 10px; border: 1px solid #cccccc; border-radius: 4px; background-color: #ffffff; color: #333333;">
+            <option value="2010-2019">2010-2019</option>
+            <option value="2011-2019">2011-2019</option>
+            <option value="2012-2019">2012-2019</option>
+            <option value="2013-2019">2013-2019</option>
+            <option value="2014-2019">2014-2019</option>
+            <option value="2015-2019">2015-2019</option>
+            <option value="2016-2019" selected>2016-2019</option>
+          </select>
+        </div>
+        <div id="allCountriesCumulativeExcessChart" class="chart"></div>
+        <p style="font-family: Georgia, 'Times New Roman', serif; color: #666666; font-size: 0.9em; text-align: center; margin-top: 10px; font-style: italic;">Figure 1</p>
+      </div>
+      <div style="flex: 1; min-width: 500px;">
+        <div style="margin-bottom: 10px;">
+          <label for="baselineSelector2" style="font-family: Georgia, 'Times New Roman', serif; font-size: 14px; color: #333333; margin-right: 10px;">Baseline:</label>
+          <select id="baselineSelector2" style="font-family: Georgia, 'Times New Roman', serif; font-size: 14px; padding: 5px 10px; border: 1px solid #cccccc; border-radius: 4px; background-color: #ffffff; color: #333333;">
+            <option value="2010-2019" selected>2010-2019</option>
+            <option value="2011-2019">2011-2019</option>
+            <option value="2012-2019">2012-2019</option>
+            <option value="2013-2019">2013-2019</option>
+            <option value="2014-2019">2014-2019</option>
+            <option value="2015-2019">2015-2019</option>
+            <option value="2016-2019">2016-2019</option>
+          </select>
+        </div>
+        <div id="allCountriesCumulativeExcessChart2010_2019" class="chart"></div>
+        <p style="font-family: Georgia, 'Times New Roman', serif; color: #666666; font-size: 0.9em; text-align: center; margin-top: 10px; font-style: italic;">Figure 2</p>
+      </div>
+    </div>
+    
+    <div style="margin-top: 30px; margin-bottom: 20px;">
+      <h2 style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1.2em; margin-bottom: 10px;">
+        Solution
+      </h2>
+      <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6;">
+        We propose a principled approach to selecting the reference period. If we treat the pandemic as an equilibrium shock to mortality, a valid baseline should predict the post-shock return to equilibrium.
+      </p>
+      <div style="background-color: #f5f5f5; padding: 20px; margin: 20px 0 20px 30px; border-left: 3px solid #cccccc; border-radius: 4px;">
+        <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6; margin: 0 0 10px 0;">
+          <strong>Equilibrium-Selected Baseline</strong>
+        </p>
+        <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6; margin: 0;">
+          For each country <em>i</em>, we select the optimal baseline period <em>B<sub>i</sub><sup>*</sup></em> that minimizes the root mean squared error (RMSE) when predicting mortality in the post-shock equilibrium year (2025):
+        </p>
+        <div style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1.1em; line-height: 1.8; margin: 20px 0; text-align: center;">
+          <em>B<sub>i</sub><sup>*</sup></em> = <span style="font-style: normal;">arg min</span><sub style="font-style: italic;"><em>B</em> ∈ <em>ℬ<sub>i</sub></em></sub> RMSE(<em>B</em>, 2025)
+        </div>
+        <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6; margin: 0;">
+          where <em>ℬ<sub>i</sub></em> is the set of all possible baseline windows for country <em>i</em> using available data up to 2019, with |<em>B</em>| ≥ 4 years.
+        </p>
+      </div>
+    </div>
+    
+    <div id="usaASMRChart" class="chart" style="margin-top: 20px; margin-bottom: 30px;"></div>
+    
+    <div style="margin-top: 30px; margin-bottom: 20px;">
+      <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6;">
+        <strong>Key Assumption: Age-standardized mortality rates returned to equilibrium in 2025.</strong><br><br>
+        The average ASMR across 22 countries shows significant excess mortality during 2020-2022, lesser excess in 2023-2024, and no excess in 2025.
+      </p>
+    </div>
+    
+    <div style="display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 500px;">
+        <div id="simpleExcessChart" class="chart"></div>
+      </div>
+      <div style="flex: 1; min-width: 500px;">
+        <div id="simpleASMRChart" class="chart"></div>
+      </div>
+    </div>
+    
+    <div style="margin-top: 30px; margin-bottom: 20px;">
+      <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6;">
+        This return to equilibrium is confirmed in the table below. Using the reference period's RMSE as the threshold for normal fluctuation: in 2024, several baselines fluctuate in and out of the normal range; by June 2025, all baselines are decisively within normal range:    </div>
+    <div id="simpleRMSETable" style="margin-top: 20px;"></div>
+    
+    <div style="margin-top: 50px; margin-bottom: 20px;">
+      <h2 style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1.2em; margin-bottom: 10px;">
+        Results
+      </h2>
+      <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6; margin-bottom: 20px;">
+        The Summary table below regresses cumulative 2020-2024 excess mortality on known structural contributors: baseline ASMR, GDP per capita, health expenditure, and a Structural Vulnerability Index. The equilibrium-selected baselines outperform all fixed baselines, demonstrating that equilibrium-based selection captures genuine variation in pandemic impact rather than baseline-induced noise.      </p>
+      <div id="regressionSummaryTable" style="margin-top: 20px;">
+        <!-- Regression Summary table will be added here -->
+      </div>
+    </div>
+    
+    <div style="margin-top: 30px; margin-bottom: 20px;">
+      <h2 style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1.2em; margin-bottom: 10px;">
+        Case Study: New Zealand
+      </h2>
+      <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6; margin-top: 15px;">
+        In the charts below we can see a dramatic difference in implied excess mortality when using a standard baseline range (2016-2019, MJ Plank) versus an equilibrium-selected range (2010-2016). The left chart implies New Zealand not only saved thousands of lives in 2020, but is continuing to save thousands of lives in 2024-2025.      </p>
+    </div>
+    
+    <div style="display: flex; gap: 20px; margin-top: 30px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 500px;">
+        <div id="nzASMRChart1Zoomed" class="chart"></div>
+      </div>
+      <div style="flex: 1; min-width: 500px;">
+        <div id="nzASMRChart2Zoomed" class="chart"></div>
+      </div>
+    </div>
+    
+    <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6; margin-top: 30px;">
+      The effect is not limited to the 2016-2019 baseline. All of the baseline ranges used by MJ Plank, OWID, The Economist and IFoA imply that New Zealand saved a comparable or greater number of lives in the last year, as compared to 2020. Our equilibrium-selected baseline (2010-2016) is the only one that doesn't imply significant lives saved in the last year.    </p>
+    
+    <div id="nzCumulativeExcessChart" class="chart" style="margin-top: 30px;"></div>
+    
+    <p style="font-family: Georgia, 'Times New Roman', serif; color: #666666; font-size: 0.9em; line-height: 1.5; margin-top: 15px; font-style: italic;">
+      <strong>Note:</strong> The cumulative traces may not exactly match the referenced studies because of methodology differences.<br>
+      - OWID (Kobak&Karlinsky) derive their baselines from raw death counts, not ASMRs. We have used ASMRs to enable fair comparison between countries.<br>
+      - MJ Plank uses New Zealand's 2021 population as the reference population. We have used the ESP2013 standard to enable fair comparison between countries.<br>
+      - Eurostat does not calculate ASMR or excess mortality for New Zealand. 
+    </p>
+    
+    <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6; margin-top: 40px; margin-bottom: 20px;">
+      The equilibrium-selected baseline (2010-2016) excludes 2017 and 2019, years with elevated all-cause mortality (+49.5 and +46.8 per 100k respectively). Notably, the 2017 mortality peak (1604.2 per 100k) was comparable to the 2022 peak (1605.1 per 100k). Including these high-mortality years in the baseline artificially inflates expected mortality, making normal mortality in 2024-2025 imply "lives saved."
+    </p>
+    
+    <div id="nzASMRComparisonChart2010_2016_Main" class="chart" style="margin-top: 20px; margin-bottom: 20px;"></div>
+    
+    <p style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; font-size: 1em; line-height: 1.6; margin-top: 20px; margin-bottom: 30px;">
+      Many countries have such idiosyncrasies due to heatwaves, severe flu seasons, or natural disasters. Our method reduces the effect of these anomalies by selecting country-specific baselines that predict the post-shock return to equilibrium.
+    </p>
+    
+    <div style="text-align: center; margin-top: 40px; margin-bottom: 20px;">
+      <button id="appendixToggle" style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; padding: 10px 20px; background-color: #f5f5f5; border: 1px solid #cccccc; border-radius: 4px; color: #333333; cursor: pointer;">
+        Appendix
+      </button>
+    </div>
+    
+    <div id="appendixSection" style="display: none;">
+      <div id="baselineComparisonTables" style="margin-top: 30px;">
+        <!-- Tables will be added here -->
+      </div>
+      
+      <div id="residualPlotsContainer" style="margin-top: 40px;">
+        <!-- Residual plots grid will be added here -->
+      </div>
+      
+      <div style="margin-top: 40px;">
+        <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 1.1em; margin-bottom: 10px; font-weight: bold;">Appendix 3</h3>
+        <div style="display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 500px;">
+            <div style="margin-bottom: 10px;">
+              <label for="baselineSelector" style="font-family: Georgia, 'Times New Roman', serif; font-size: 14px; color: #333333; margin-right: 10px;">Baseline:</label>
+              <select id="baselineSelector" style="font-family: Georgia, 'Times New Roman', serif; font-size: 14px; padding: 5px 10px; border: 1px solid #cccccc; border-radius: 4px; background-color: #ffffff; color: #333333;">
+                <option value="2016-2019">2016-2019</option>
+                <option value="2010-2019">2010-2019</option>
+                <option value="2011-2019">2011-2019</option>
+                <option value="2012-2019">2012-2019</option>
+                <option value="2013-2019">2013-2019</option>
+                <option value="2014-2019">2014-2019</option>
+                <option value="2015-2019">2015-2019</option>
+              </select>
+            </div>
+            <div id="nzASMRComparisonChart" class="chart"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 40px;">
+        <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 1.1em; margin-bottom: 10px; font-weight: bold;">Appendix 4</h3>
+        <div style="display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 500px;">
+            <div id="nzASMRComparisonChart2010_2016" class="chart"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 40px;">
+        <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 1.1em; margin-bottom: 10px; font-weight: bold;">Appendix 5</h3>
+        <div style="display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 500px;">
+            <div id="nzASMRChart1" class="chart"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 40px;">
+        <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 1.1em; margin-bottom: 10px; font-weight: bold;">Appendix 6</h3>
+        <div style="display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 500px;">
+            <div id="nzASMRChart2" class="chart"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="sviTableContainer" style="margin-top: 40px;">
+        <!-- SVI table will be added here -->
+      </div>
+    </div>
+  </main>
+  
+  <script>
+    // Toggle appendix section visibility
+    document.addEventListener('DOMContentLoaded', function() {
+      const appendixToggle = document.getElementById('appendixToggle');
+      const appendixSection = document.getElementById('appendixSection');
+      
+      if (appendixToggle && appendixSection) {
+        appendixToggle.addEventListener('click', function() {
+          if (appendixSection.style.display === 'none') {
+            appendixSection.style.display = 'block';
+            appendixToggle.textContent = 'Hide Appendix';
+          } else {
+            appendixSection.style.display = 'none';
+            appendixToggle.textContent = 'Appendix';
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
+
